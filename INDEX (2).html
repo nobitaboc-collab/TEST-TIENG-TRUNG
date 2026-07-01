@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kiểm tra trình độ tiếng Trung cơ bản</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF6EC;
+    --paper-2:#F2ECDD;
+    --ink:#2B2420;
+    --ink-soft:#5B5148;
+    --seal:#B3382C;
+    --seal-dark:#8E2A21;
+    --jade:#4F7868;
+    --gold:#B8902E;
+    --line:#DCD2BC;
+    --ok:#3E7A52;
+    --bad:#B3382C;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper-2);
+    background-image:
+      radial-gradient(circle at 15% 8%, rgba(179,56,44,0.05), transparent 40%),
+      radial-gradient(circle at 90% 85%, rgba(79,120,104,0.06), transparent 45%);
+    color:var(--ink);
+    font-family:'Be Vietnam Pro', sans-serif;
+    line-height:1.5;
+    min-height:100vh;
+    padding:28px 14px 60px;
+  }
+  .cn{font-family:'Noto Serif SC', serif;}
+  .wrap{max-width:760px;margin:0 auto;}
+
+  .paper{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:6px;
+    box-shadow:0 1px 2px rgba(43,36,32,0.06), 0 12px 32px -18px rgba(43,36,32,0.35);
+    position:relative;
+    overflow:hidden;
+  }
+  .paper::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      linear-gradient(90deg, transparent 0, transparent 100%);
+    pointer-events:none;
+  }
+
+  header.top{
+    padding:30px 30px 22px;
+    border-bottom:1px solid var(--line);
+    text-align:center;
+    position:relative;
+  }
+  .eyebrow{
+    font-family:'Noto Serif SC', serif;
+    font-size:13px;
+    letter-spacing:.25em;
+    color:var(--seal);
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  h1{
+    font-family:'Noto Serif SC', serif;
+    font-weight:900;
+    font-size:clamp(24px,4.5vw,32px);
+    margin:0 0 6px;
+    color:var(--ink);
+  }
+  .sub{
+    color:var(--ink-soft);
+    font-size:14.5px;
+    max-width:480px;
+    margin:0 auto;
+  }
+
+  .timerbar{
+    position:sticky; top:0; z-index:20;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 18px;
+    background:rgba(250,246,236,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .timerbar .prog{
+    flex:1; height:6px; background:var(--line); border-radius:99px; margin:0 14px; overflow:hidden;
+  }
+  .timerbar .prog i{
+    display:block; height:100%; background:var(--jade); width:100%; transition:width .4s linear, background .4s;
+  }
+  .timerbar .clock{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700; font-size:15px; color:var(--ink);
+    min-width:58px; text-align:right;
+  }
+  .timerbar .clock.warn{color:var(--seal);}
+  .timerbar .lbl{font-size:12px;color:var(--ink-soft); white-space:nowrap;}
+
+  .content{padding:26px 26px 10px;}
+
+  /* Start screen */
+  .weights{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:10px;
+    margin:20px 0 6px;
+  }
+  .weights div{
+    background:var(--paper-2); border:1px solid var(--line); border-radius:6px;
+    padding:12px 6px; text-align:center;
+  }
+  .weights .cn{display:block; font-size:22px; color:var(--seal); margin-bottom:2px;}
+  .weights .pct{display:block; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:15px;}
+  .weights .name{display:block; font-size:12px; color:var(--ink-soft);}
+
+  .rules{
+    background:var(--paper-2); border:1px dashed var(--line); border-radius:6px;
+    padding:16px 18px; font-size:13.5px; color:var(--ink-soft); margin:18px 0;
+  }
+  .rules li{margin-bottom:5px;}
+
+  .bigbtn{
+    display:block; width:100%; text-align:center;
+    background:var(--seal); color:#fff; border:none; border-radius:6px;
+    font-family:'Be Vietnam Pro',sans-serif; font-weight:700; font-size:16px;
+    padding:15px 20px; cursor:pointer; letter-spacing:.02em;
+    transition:background .15s, transform .1s;
+  }
+  .bigbtn:hover{background:var(--seal-dark);}
+  .bigbtn:active{transform:scale(.99);}
+  .bigbtn.secondary{background:var(--jade);}
+  .bigbtn.secondary:hover{background:#3f6152;}
+  .bigbtn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);}
+  .bigbtn.ghost:hover{background:var(--paper-2);}
+
+  /* Section divider */
+  .section-head{
+    display:flex; align-items:center; gap:12px;
+    margin:34px 0 16px;
+  }
+  .section-head:first-of-type{margin-top:6px;}
+  .section-head .glyph{
+    font-family:'Noto Serif SC', serif; font-size:26px; font-weight:700;
+    color:#fff; background:var(--ink); width:40px;height:40px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center; flex-shrink:0;
+  }
+  .section-head .txt{flex:1;}
+  .section-head .name{font-weight:800; font-size:16px;}
+  .section-head .meta{font-size:12px;color:var(--ink-soft);}
+  .section-head .rule{flex:1;height:1px;background:var(--line);}
+
+  /* Question card */
+  .qcard{
+    border:1px solid var(--line); border-radius:6px;
+    padding:16px 18px; margin-bottom:14px; background:var(--paper);
+    position:relative;
+  }
+  .qcard .qnum{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft);
+    letter-spacing:.05em; margin-bottom:6px; text-transform:uppercase;
+  }
+  .qcard .prompt{font-size:15.5px; font-weight:600; margin-bottom:10px;}
+  .audio-row{display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;}
+  .audio-btn{
+    display:inline-flex; align-items:center; gap:7px;
+    background:var(--jade); color:#fff; border:none; border-radius:99px;
+    padding:8px 16px; font-size:13.5px; font-weight:600; cursor:pointer;
+  }
+  .audio-btn:hover{background:#3f6152;}
+  .audio-btn:disabled{opacity:.5; cursor:default;}
+  .fallback-btn{
+    font-size:12px; color:var(--ink-soft); background:none; border:none;
+    text-decoration:underline; cursor:pointer; padding:4px 0;
+  }
+  .fallback-text{
+    display:none; font-family:'Noto Serif SC',serif; font-size:16px; color:var(--seal);
+    background:var(--paper-2); padding:6px 10px; border-radius:4px;
+  }
+  .opts{display:grid; gap:8px;}
+  .opt{
+    display:flex; align-items:center; gap:10px;
+    border:1px solid var(--line); border-radius:6px; padding:10px 12px;
+    cursor:pointer; font-size:14.5px; background:var(--paper);
+    transition:border-color .12s, background .12s;
+  }
+  .opt:hover{border-color:var(--jade); background:var(--paper-2);}
+  .opt input{accent-color:var(--seal); width:16px; height:16px; flex-shrink:0;}
+  .opt.selected{border-color:var(--seal); background:#FBEFEC;}
+
+  .submitzone{
+    margin-top:26px; padding-top:20px; border-top:1px solid var(--line);
+    text-align:center;
+  }
+  .submitzone p{font-size:12.5px; color:var(--ink-soft); margin:10px 0 0;}
+
+  /* Results */
+  .resultwrap{display:none;}
+  .seal-stamp{
+    width:150px;height:150px; margin:14px auto 6px; border-radius:50%;
+    border:5px solid var(--seal); color:var(--seal);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    transform:rotate(-8deg) scale(.8); opacity:0;
+    animation:stampIn .5s cubic-bezier(.2,1.4,.4,1) .15s forwards;
+  }
+  @keyframes stampIn{to{transform:rotate(-8deg) scale(1); opacity:1;}}
+  .seal-stamp .score{font-family:'Noto Serif SC',serif; font-weight:900; font-size:42px; line-height:1;}
+  .seal-stamp .of{font-size:11px; letter-spacing:.15em;}
+  .seal-stamp .lv{font-family:'Noto Serif SC',serif; font-size:13px; font-weight:700; margin-top:2px;}
+
+  .levelname{text-align:center; font-weight:700; font-size:16px; margin:12px 0 2px;}
+  .levelsub{text-align:center; font-size:13px; color:var(--ink-soft); margin-bottom:22px;}
+
+  .breakdown{display:grid; gap:10px; margin-bottom:24px;}
+  .bd-row{display:flex; align-items:center; gap:10px;}
+  .bd-row .bglyph{
+    font-family:'Noto Serif SC',serif; width:30px;height:30px;border-radius:50%;
+    background:var(--ink); color:#fff; display:flex;align-items:center;justify-content:center;
+    font-size:16px; flex-shrink:0;
+  }
+  .bd-row .bname{width:64px; font-size:13px; font-weight:600; flex-shrink:0;}
+  .bd-row .btrack{flex:1; height:8px; background:var(--line); border-radius:99px; overflow:hidden;}
+  .bd-row .btrack i{display:block; height:100%; background:var(--seal); border-radius:99px;}
+  .bd-row .bval{font-family:'JetBrains Mono',monospace; font-size:12.5px; width:74px; text-align:right; flex-shrink:0;}
+
+  .review-item{
+    border:1px solid var(--line); border-radius:6px; padding:14px 16px; margin-bottom:10px;
+  }
+  .review-item .rtop{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:6px;}
+  .review-item .rq{font-size:14px; font-weight:600;}
+  .badge{
+    flex-shrink:0; font-size:11px; font-weight:700; padding:3px 9px; border-radius:99px;
+  }
+  .badge.ok{background:#E6F1EA; color:var(--ok);}
+  .badge.bad{background:#FBEAE8; color:var(--bad);}
+  .rline{font-size:13px; margin:3px 0; color:var(--ink-soft);}
+  .rline b{color:var(--ink);}
+  .explain{
+    margin-top:8px; background:var(--paper-2); border-left:3px solid var(--gold);
+    padding:8px 10px; font-size:12.5px; color:var(--ink-soft); border-radius:4px;
+  }
+  .cnrevealtxt{font-family:'Noto Serif SC',serif; color:var(--seal); font-size:15px;}
+
+  footer.note{
+    text-align:center; font-size:11.5px; color:var(--ink-soft); margin-top:26px; padding:0 10px 4px;
+  }
+
+  @media(max-width:520px){
+    .weights{grid-template-columns:repeat(2,1fr);}
+    .content{padding:20px 16px 8px;}
+    header.top{padding:24px 18px 18px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="paper">
+
+    <div class="timerbar" id="timerbar" style="display:none;">
+      <span class="lbl" id="progressLbl">Câu 0/20</span>
+      <div class="prog"><i id="progFill"></i></div>
+      <span class="clock" id="clock">15:00</span>
+    </div>
+
+    <header class="top">
+      <div class="eyebrow">中文水平测试 · Basic Chinese Test</div>
+      <h1>Kiểm tra trình độ tiếng Trung cơ bản</h1>
+      <p class="sub">20 câu trắc nghiệm — Nghe · Đọc · Nói · Viết. Không cần đăng nhập, không thu thập thông tin cá nhân.</p>
+    </header>
+
+    <div class="content">
+
+      <!-- START SCREEN -->
+      <div id="startScreen">
+        <div class="weights">
+          <div><span class="cn">听</span><span class="pct" id="wNghe">40%</span><span class="name">Nghe</span></div>
+          <div><span class="cn">读</span><span class="pct" id="wDoc">45%</span><span class="name">Đọc</span></div>
+          <div><span class="cn">说</span><span class="pct" id="wNoi">10%</span><span class="name">Nói</span></div>
+          <div><span class="cn">写</span><span class="pct" id="wViet">5%</span><span class="name">Viết</span></div>
+        </div>
+        <div class="rules">
+          <ul>
+            <li>Bài test gồm <b>20 câu</b>, làm trong <b>15 phút</b> — hết giờ hệ thống sẽ tự động nộp bài.</li>
+            <li>Phần <b>Nghe</b> phát âm thanh bằng giọng đọc của trình duyệt (bấm nút 🔊). Nếu thiết bị không hỗ trợ, sẽ có lựa chọn hiện chữ thay thế.</li>
+            <li>Không cần đăng nhập, không cần nhập tên hay bất kỳ thông tin cá nhân nào.</li>
+            <li>Sau khi nộp bài, bạn sẽ thấy điểm số theo từng kỹ năng kèm đáp án đúng và giải thích chi tiết.</li>
+            <li>Có thể làm lại bài test bao nhiêu lần tùy thích.</li>
+          </ul>
+        </div>
+        <button class="bigbtn" onclick="startTest()">Bắt đầu làm bài</button>
+      </div>
+
+      <!-- QUIZ SCREEN -->
+      <form id="quizScreen" style="display:none;"></form>
+      <div id="submitZone" class="submitzone" style="display:none;">
+        <button type="button" class="bigbtn secondary" onclick="tryFinish()">Nộp bài</button>
+        <p>Kiểm tra lại các câu chưa trả lời trước khi nộp bài.</p>
+      </div>
+
+      <!-- RESULT SCREEN -->
+      <div id="resultScreen" class="resultwrap">
+        <div class="seal-stamp">
+          <span class="score" id="resScore">0</span>
+          <span class="of">/ 100 ĐIỂM</span>
+          <span class="lv cn" id="resLvCn">及格</span>
+        </div>
+        <div class="levelname" id="resLevel"></div>
+        <div class="levelsub" id="resLevelSub"></div>
+
+        <div class="breakdown" id="breakdown"></div>
+
+        <div id="reviewList"></div>
+
+        <button class="bigbtn ghost" style="margin-top:8px;" onclick="location.reload()">Làm lại bài test</button>
+      </div>
+
+    </div>
+
+    <footer class="note">Bài test mang tính chất tự đánh giá cơ bản, không phải chứng chỉ HSK chính thức.</footer>
+  </div>
+</div>
+
+<script>
+const SKILLS = {
+  nghe:{label:'Nghe', cn:'听', weight:40},
+  doc:{label:'Đọc', cn:'读', weight:45},
+  noi:{label:'Nói', cn:'说', weight:10},
+  viet:{label:'Viết', cn:'写', weight:5}
+};
+
+const QUESTIONS = [
+  // NGHE (7)
+  {id:1, skill:'nghe', audio:'你好!', prompt:'Câu vừa nghe có nghĩa là gì?',
+   options:['Xin chào','Tạm biệt','Cảm ơn','Xin lỗi'], correct:0,
+   reveal:'你好 (nǐ hǎo)',
+   explain:'“你好 (nǐ hǎo)” là câu chào hỏi cơ bản nhất trong tiếng Trung, dùng khi gặp mặt ai đó.'},
+  {id:2, skill:'nghe', audio:'谢谢你。', prompt:'Câu vừa nghe có nghĩa là gì?',
+   options:['Cảm ơn bạn','Xin lỗi bạn','Tạm biệt bạn','Chúc mừng bạn'], correct:0,
+   reveal:'谢谢你 (xièxie nǐ)',
+   explain:'“谢谢 (xièxie)” nghĩa là cảm ơn; “你 (nǐ)” nghĩa là bạn/anh/chị.'},
+  {id:3, skill:'nghe', audio:'这个多少钱?', prompt:'Câu vừa nghe dùng để làm gì?',
+   options:['Hỏi giá tiền','Hỏi giờ','Hỏi tên','Hỏi đường'], correct:0,
+   reveal:'这个多少钱? (zhège duōshao qián?)',
+   explain:'“多少钱 (duōshao qián)” nghĩa là “bao nhiêu tiền”, dùng khi hỏi giá một món đồ.'},
+  {id:4, skill:'nghe', audio:'现在三点半。', prompt:'Bây giờ là mấy giờ?',
+   options:['3:00','3:15','3:30','3:45'], correct:2,
+   reveal:'现在三点半 (xiànzài sān diǎn bàn)',
+   explain:'“三点半 (sān diǎn bàn)” nghĩa là 3 giờ rưỡi (3:30); “半 (bàn)” nghĩa là rưỡi/nửa.'},
+  {id:5, skill:'nghe', audio:'我今年二十岁。', prompt:'Người nói bao nhiêu tuổi?',
+   options:['12 tuổi','20 tuổi','22 tuổi','29 tuổi'], correct:1,
+   reveal:'我今年二十岁 (wǒ jīnnián èrshí suì)',
+   explain:'“二十岁 (èrshí suì)” nghĩa là 20 tuổi.'},
+  {id:6, skill:'nghe', audio:'我是越南人,我不是中国人。', prompt:'Người nói là người nước nào?',
+   options:['Trung Quốc','Việt Nam','Nhật Bản','Hàn Quốc'], correct:1,
+   reveal:'我是越南人,我不是中国人 (wǒ shì Yuènán rén, wǒ bú shì Zhōngguó rén)',
+   explain:'“我是越南人 (wǒ shì Yuènán rén)” nghĩa là “tôi là người Việt Nam”; “不是 (bú shì)” nghĩa là không phải.'},
+  {id:7, skill:'nghe', audio:'他喜欢喝茶,不喜欢喝咖啡。', prompt:'Anh ấy thích uống gì?',
+   options:['Cà phê','Trà','Nước lọc','Sữa'], correct:1,
+   reveal:'他喜欢喝茶,不喜欢喝咖啡 (tā xǐhuan hē chá, bù xǐhuan hē kāfēi)',
+   explain:'“喜欢喝茶 (xǐhuan hē chá)” nghĩa là thích uống trà; anh ấy không thích cà phê (咖啡).'},
+
+  // ĐỌC (8)
+  {id:8, skill:'doc', prompt:'Chọn từ đúng điền vào chỗ trống: 我 ___ 学生。',
+   options:['是','在','有','去'], correct:0,
+   explain:'“是 (shì)” nghĩa là “là”, dùng để nối chủ ngữ với danh từ chỉ thân phận/nghề nghiệp. Câu hoàn chỉnh: 我是学生 (Tôi là học sinh).'},
+  {id:9, skill:'doc', prompt:'Chọn từ đúng điền vào chỗ trống: 这是 ___ 书。 (Đây là sách của tôi)',
+   options:['我','我的','我们','自己'], correct:1,
+   explain:'“的 (de)” là trợ từ sở hữu; “我的 (wǒ de)” nghĩa là “của tôi”.'},
+  {id:10, skill:'doc', prompt:'Đọc đoạn văn sau và trả lời câu hỏi:<br><span class="cnrevealtxt">小明每天七点起床,八点上学,下午四点放学回家。</span><br><br>Tiểu Minh mấy giờ đi học?',
+   options:['7 giờ','8 giờ','4 giờ chiều','Không rõ'], correct:1,
+   explain:'“八点上学 (bā diǎn shàngxué)” nghĩa là 8 giờ đi học.'},
+  {id:11, skill:'doc', prompt:'Vẫn đoạn văn ở câu trên: Tiểu Minh mấy giờ tan học về nhà?',
+   options:['7 giờ','8 giờ','4 giờ chiều','9 giờ tối'], correct:2,
+   explain:'“下午四点放学 (xiàwǔ sì diǎn fàngxué)” nghĩa là 4 giờ chiều tan học.'},
+  {id:12, skill:'doc', prompt:'Chữ “水” có nghĩa là gì?',
+   options:['Lửa','Nước','Đất','Gió'], correct:1,
+   explain:'“水 (shuǐ)” nghĩa là nước — một trong những chữ Hán tượng hình cơ bản nhất.'},
+  {id:13, skill:'doc', prompt:'“明天” có nghĩa là gì?',
+   options:['Hôm qua','Hôm nay','Ngày mai','Tuần sau'], correct:2,
+   explain:'“明天 (míngtiān)” nghĩa là ngày mai; “昨天 (zuótiān)” = hôm qua, “今天 (jīntiān)” = hôm nay.'},
+  {id:14, skill:'doc', prompt:'Chọn từ đúng điền vào chỗ trống: 我 ___ 喜欢猫。 (Tôi rất thích mèo)',
+   options:['很','在','是','有'], correct:0,
+   explain:'“很 (hěn)” nghĩa là “rất”, thường đứng trước tính từ hoặc động từ chỉ cảm xúc/mức độ.'},
+  {id:15, skill:'doc', prompt:'Chọn lượng từ đúng: 一 ___ 书 (một quyển sách)',
+   options:['个','本','张','杯'], correct:1,
+   explain:'“本 (běn)” là lượng từ chuyên dùng cho sách, vở, tạp chí.'},
+
+  // NÓI (3)
+  {id:16, skill:'noi', prompt:'Từ “妈妈” (mẹ) — cả hai âm tiết được ghi thanh điệu chuẩn là gì?',
+   options:['Thanh 1 - Thanh 1 (māma)','Thanh 2 - Thanh 1 (máma)','Thanh 3 - Thanh 4 (mǎmà)','Thanh 4 - Thanh 4 (màmà)'], correct:0,
+   explain:'“妈妈 (māma)” cả hai âm tiết đều ở thanh 1 (thanh ngang); trong khẩu ngữ âm tiết thứ hai thường được đọc nhẹ hơn.'},
+  {id:17, skill:'noi', prompt:'Chữ “谢” trong “谢谢” mang thanh điệu số mấy?',
+   options:['Thanh 1','Thanh 2','Thanh 3','Thanh 4'], correct:3,
+   explain:'“谢 (xiè)” là thanh 4 — thanh điệu đi xuống nhanh và dứt khoát.'},
+  {id:18, skill:'noi', prompt:'Cụm từ “你好” gồm mấy âm tiết (mỗi chữ Hán tương ứng một âm tiết)?',
+   options:['1 âm tiết','2 âm tiết','3 âm tiết','4 âm tiết'], correct:1,
+   explain:'“你好” gồm 2 chữ Hán là “你” và “好”, mỗi chữ ứng với một âm tiết, tổng cộng có 2 âm tiết: nǐ - hǎo.'},
+
+  // VIẾT (2)
+  {id:19, skill:'viet', prompt:'Chữ “人” (người) được viết bằng bao nhiêu nét?',
+   options:['1 nét','2 nét','3 nét','4 nét'], correct:1,
+   explain:'“人” gồm 2 nét: một nét phẩy (丿) và một nét mác (乀), tạo thành hình dáng giống hai chân người.'},
+  {id:20, skill:'viet', prompt:'Chọn chữ Hán có nghĩa là “lớn, to”:',
+   options:['小','大','多','少'], correct:1,
+   explain:'“大 (dà)” nghĩa là “lớn, to”. Các chữ khác: “小 (xiǎo)” = nhỏ, “多 (duō)” = nhiều, “少 (shǎo)” = ít.'}
+];
+
+const SKILL_ORDER = ['nghe','doc','noi','viet'];
+const TOTAL_TIME = 15*60; // seconds
+let timeLeft = TOTAL_TIME;
+let timerHandle = null;
+let answers = {}; // id -> index
+let started = false;
+
+function buildQuiz(){
+  const form = document.getElementById('quizScreen');
+  let html = '';
+  SKILL_ORDER.forEach(skKey=>{
+    const sk = SKILLS[skKey];
+    const qs = QUESTIONS.filter(q=>q.skill===skKey);
+    html += `<div class="section-head">
+        <div class="glyph cn">${sk.cn}</div>
+        <div class="txt"><div class="name">${sk.label}</div><div class="meta">${qs.length} câu · chiếm ${sk.weight}% tổng điểm</div></div>
+        <div class="rule"></div>
+      </div>`;
+    qs.forEach(q=>{
+      const idx = QUESTIONS.indexOf(q)+1;
+      html += `<div class="qcard" data-qid="${q.id}">
+        <div class="qnum">Câu ${idx}/20 · ${sk.label}</div>
+        <div class="prompt">${q.prompt}</div>`;
+      if(q.audio){
+        html += `<div class="audio-row">
+          <button type="button" class="audio-btn" id="audiobtn${q.id}" onclick="playAudio(${q.id})">🔊 Nghe câu này</button>
+          <button type="button" class="fallback-btn" onclick="showFallback(${q.id})">Không nghe được? Hiện chữ</button>
+        </div>
+        <div class="fallback-text" id="fallback${q.id}">${q.reveal}</div>`;
+      }
+      html += `<div class="opts">`;
+      q.options.forEach((opt,i)=>{
+        html += `<label class="opt" id="opt-${q.id}-${i}">
+          <input type="radio" name="q${q.id}" value="${i}" onchange="selectAnswer(${q.id},${i})">
+          <span>${opt}</span>
+        </label>`;
+      });
+      html += `</div></div>`;
+    });
+  });
+  form.innerHTML = html;
+}
+
+function selectAnswer(qid, idx){
+  answers[qid] = idx;
+  document.querySelectorAll(`[id^="opt-${qid}-"]`).forEach(el=>el.classList.remove('selected'));
+  document.getElementById(`opt-${qid}-${idx}`).classList.add('selected');
+  updateProgress();
+}
+
+function updateProgress(){
+  const answered = Object.keys(answers).length;
+  document.getElementById('progressLbl').textContent = `Đã trả lời ${answered}/20`;
+  document.getElementById('progFill').style.width = (answered/20*100)+'%';
+}
+
+let voiceReady = false;
+function pickChineseVoice(){
+  const voices = speechSynthesis.getVoices();
+  return voices.find(v=>v.lang && v.lang.toLowerCase().startsWith('zh')) || null;
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged = ()=>{ voiceReady = true; };
+}
+
+function playAudio(qid){
+  const q = QUESTIONS.find(x=>x.id===qid);
+  const btn = document.getElementById('audiobtn'+qid);
+  if(!('speechSynthesis' in window)){
+    showFallback(qid);
+    btn.disabled = true;
+    btn.textContent = '🔇 Không hỗ trợ âm thanh';
+    return;
+  }
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(q.audio);
+  utter.lang = 'zh-CN';
+  utter.rate = 0.82;
+  const v = pickChineseVoice();
+  if(v) utter.voice = v;
+  btn.textContent = '🔊 Đang phát...';
+  btn.disabled = true;
+  utter.onend = ()=>{ btn.textContent = '🔁 Phát lại'; btn.disabled = false; };
+  utter.onerror = ()=>{ btn.textContent = '🔁 Phát lại'; btn.disabled = false; showFallback(qid); };
+  speechSynthesis.speak(utter);
+}
+
+function showFallback(qid){
+  const el = document.getElementById('fallback'+qid);
+  if(el) el.style.display = 'block';
+}
+
+function startTest(){
+  buildQuiz();
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('quizScreen').style.display = 'block';
+  document.getElementById('submitZone').style.display = 'block';
+  document.getElementById('timerbar').style.display = 'flex';
+  started = true;
+  updateProgress();
+  timerHandle = setInterval(tick, 1000);
+}
+
+function tick(){
+  timeLeft--;
+  const m = Math.floor(timeLeft/60), s = timeLeft%60;
+  const clockEl = document.getElementById('clock');
+  clockEl.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  if(timeLeft<=60) clockEl.classList.add('warn');
+  document.getElementById('progFill').style.width = ((TOTAL_TIME-timeLeft)/TOTAL_TIME*0)+'%'; // keep answered-progress bar untouched
+  updateProgress();
+  if(timeLeft<=0){
+    clearInterval(timerHandle);
+    finishTest();
+  }
+}
+
+function tryFinish(){
+  const answered = Object.keys(answers).length;
+  if(answered < 20){
+    const ok = confirm(`Bạn còn ${20-answered} câu chưa trả lời. Bạn có chắc muốn nộp bài không?`);
+    if(!ok) return;
+  }
+  clearInterval(timerHandle);
+  finishTest();
+}
+
+function finishTest(){
+  if('speechSynthesis' in window) speechSynthesis.cancel();
+  document.getElementById('quizScreen').style.display = 'none';
+  document.getElementById('submitZone').style.display = 'none';
+  document.getElementById('timerbar').style.display = 'none';
+  document.getElementById('resultScreen').style.display = 'block';
+
+  // Scoring
+  let skillStats = {};
+  SKILL_ORDER.forEach(k=>skillStats[k] = {correct:0, total:0});
+  QUESTIONS.forEach(q=>{
+    skillStats[q.skill].total++;
+    if(answers[q.id] === q.correct) skillStats[q.skill].correct++;
+  });
+
+  let total = 0;
+  const breakdownEl = document.getElementById('breakdown');
+  let bhtml = '';
+  SKILL_ORDER.forEach(k=>{
+    const sk = SKILLS[k];
+    const st = skillStats[k];
+    const pts = (st.correct/st.total)*sk.weight;
+    total += pts;
+    const pct = st.total? (st.correct/st.total*100):0;
+    bhtml += `<div class="bd-row">
+      <div class="bglyph cn">${sk.cn}</div>
+      <div class="bname">${sk.label}</div>
+      <div class="btrack"><i style="width:${pct}%"></i></div>
+      <div class="bval">${st.correct}/${st.total} · ${pts.toFixed(1)}đ</div>
+    </div>`;
+  });
+  breakdownEl.innerHTML = bhtml;
+
+  total = Math.round(total*10)/10;
+  document.getElementById('resScore').textContent = total;
+
+  let levelName, levelSub, cnLv;
+  if(total>=90){ levelName='Xuất sắc'; levelSub='Nền tảng vững chắc, tương đương HSK2 trở lên.'; cnLv='优秀'; }
+  else if(total>=75){ levelName='Khá'; levelSub='Nắm khá tốt kiến thức cơ bản, gần đạt HSK2.'; cnLv='良好'; }
+  else if(total>=60){ levelName='Trung bình'; levelSub='Đã có nền tảng cơ bản, tương đương HSK1.'; cnLv='及格'; }
+  else if(total>=40){ levelName='Yếu'; levelSub='Mới bắt đầu làm quen, cần luyện tập thêm nhiều.'; cnLv='待加强'; }
+  else { levelName='Cần cố gắng thêm'; levelSub='Nên bắt đầu ôn lại các kiến thức tiếng Trung cơ bản nhất.'; cnLv='需努力'; }
+  document.getElementById('resLevel').textContent = levelName;
+  document.getElementById('resLevelSub').textContent = levelSub;
+  document.getElementById('resLvCn').textContent = cnLv;
+
+  // Review list
+  const reviewEl = document.getElementById('reviewList');
+  let rhtml = '';
+  QUESTIONS.forEach((q,i)=>{
+    const userIdx = answers[q.id];
+    const isCorrect = userIdx === q.correct;
+    const userAnsText = (userIdx===undefined)?'Chưa trả lời':q.options[userIdx];
+    rhtml += `<div class="review-item">
+      <div class="rtop">
+        <div class="rq">Câu ${i+1}. ${q.prompt.replace(/<br>/g,' ')}</div>
+        <span class="badge ${isCorrect?'ok':'bad'}">${isCorrect?'Đúng':'Sai'}</span>
+      </div>
+      ${q.reveal?`<div class="rline cnrevealtxt">${q.reveal}</div>`:''}
+      <div class="rline">Bạn chọn: <b>${userAnsText}</b></div>
+      <div class="rline">Đáp án đúng: <b>${q.options[q.correct]}</b></div>
+      <div class="explain">${q.explain}</div>
+    </div>`;
+  });
+  reviewEl.innerHTML = rhtml;
+
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// Warn on leave if in progress
+window.addEventListener('beforeunload', function(e){
+  if(started && document.getElementById('resultScreen').style.display !== 'block'){
+    e.preventDefault(); e.returnValue='';
+  }
+});
+</script>
+</body>
+</html>
